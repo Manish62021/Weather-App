@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      width: 350px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button {
+      margin-top: 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .temp {
+      font-size: 40px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .condition {
+      font-size: 18px;
+      margin-top: 5px;
+    }
+
+    img {
+      width: 80px;
+      height: 80px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌦 Weather App</h1>
+    <input type="text" id="locationInput" placeholder="Enter location...">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="error" class="error"></div>
+
+    <div class="result" id="weatherResult">
+      <h2 id="cityName"></h2>
+      <img id="weatherIcon" alt="Weather Icon">
+      <div class="temp" id="temperature"></div>
+      <div class="condition" id="condition"></div>
+    </div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const location = document.getElementById('locationInput').value.trim();
+      const errorDiv = document.getElementById('error');
+      const resultDiv = document.getElementById('weatherResult');
+
+      if (location === "") {
+        errorDiv.textContent = "Please enter a location!";
+        resultDiv.style.display = "none";
+        return;
+      }
+
+      const apiKey = "d8d0db9652614ec38d1191625251310";
+      const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Location not found");
+
+        const data = await response.json();
+
+        document.getElementById('cityName').textContent = `${data.location.name}, ${data.location.country}`;
+        document.getElementById('temperature').textContent = `${data.current.temp_c}°C`;
+        document.getElementById('condition').textContent = data.current.condition.text;
+        document.getElementById('weatherIcon').src = `https:${data.current.condition.icon}`;
+        resultDiv.style.display = "block";
+        errorDiv.textContent = "";
+      } catch (error) {
+        errorDiv.textContent = "❌ Unable to find weather for that location.";
+        resultDiv.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
